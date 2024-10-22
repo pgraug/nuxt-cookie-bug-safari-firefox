@@ -41,6 +41,18 @@
       >
     </div>
     <br />
+    <div>
+      <input
+        type="checkbox"
+        id="shouldDelay"
+        name="shouldDelay"
+        v-model="shouldDelay"
+      />
+      <label for="shouldDelay"
+        >Then wait 10ms before taking snapshot of useCookie's value?</label
+      >
+    </div>
+    <br />
 
     <button @click="testBug">Click to set the cookie</button>
 
@@ -59,8 +71,9 @@
 </template>
 
 <script setup lang="ts">
-const shouldRefreshCookie = ref(false);
 const cookieMethod = ref<"document.cookie" | "fetch">("fetch");
+const shouldRefreshCookie = ref(false);
+const shouldDelay = ref(false);
 
 const cookie = useCookie("testCookie", {
   readonly: true,
@@ -95,9 +108,13 @@ async function testBug() {
     });
   }
 
-  if (shouldRefreshCookie) {
+  if (shouldRefreshCookie.value) {
     console.log("refreshing cookie");
     refreshCookie("testCookie");
+  }
+
+  if (shouldDelay.value) {
+    await new Promise((resolve) => setTimeout(resolve, 10));
   }
 
   const newValue = Number.parseInt(cookie.value || "0");
